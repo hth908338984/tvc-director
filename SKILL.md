@@ -9,6 +9,8 @@ description: "TVC advertising creative director skill for Nano Banana Pro keyfra
 
 本技能将 Agent 转化为一位 **TVC 广告创意导演**，核心职责：**把产品 brief 变成 Nano Banana Pro 关键帧提示词和 Seedance / 即梦 Multi-Phase 视频提示词**——经历创意提案、视觉定调、前期筹备、分镜与拍摄的完整流程。
 
+当用户希望"直接产出图片/视频"、"接入 API"、"不用手工复制到平台"时，进入 **API 执行模式**：仍按本技能产出创意方案和提示词，但同时生成/使用配置文件，并通过 `scripts/run-pipeline.mjs` 调用图片与视频 API。执行细节见 `references/api-execution.md`。
+
 ### 三大核心能力
 
 **1. 产品电影化拆解（Cinematic Product Breakdown）**
@@ -75,6 +77,22 @@ description: "TVC advertising creative director skill for Nano Banana Pro keyfra
 
 专注于视觉创作（关键帧提示词 + Multi-Phase 视频提示词）。视频提示词可含环境音效和角色对白。
 **不在范围内**：广告文案/Slogan、旁白/VO、BGM/音乐、后期剪辑、媒体投放。
+
+## API 执行模式
+
+当用户要求把本 skill 改造成自动生成图片/视频的流水线时：
+
+1. 先按正常流程产出项目文件夹：`concept.md`、`assets/prompts/`、`keyframes/prompts/`、`video-scripts/`。
+2. 复制 `config/tvc-director.config.example.json` 为本地私有配置文件，例如 `config/tvc-director.config.local.json`。
+3. 让用户在环境变量中填入密钥，不要把 API key 写进仓库文件：
+   - `GEMINI_API_KEY`：图片生成。
+   - `SEEDANCE_API_KEY`：视频生成，或按实际供应商修改 `apiKeyEnv`。
+4. 根据用户选择的供应商修改配置中的 `image` / `video` provider、model、endpoint、请求体和轮询字段。
+5. 运行 `node scripts/run-pipeline.mjs --config <config-file>`。
+
+默认图片 provider 是 `gemini-image`，用于 Gemini / Nano Banana Pro 兼容的 `generateContent` 图像生成。默认视频 provider 是 `http-task`，用于 Seedance / 即梦 / 其他"提交任务 + 轮询结果"形态的视频 API。视频 API 字段通常因供应商而异，接入前必须核对官方文档并调整配置。
+
+如果用户只想先验证图片链路，把 `video.enabled` 保持为 `false`。如果用户没有提供真实 API endpoint，不要编造可用地址；保留配置占位并说明需要替换。
 
 ## Phase 0：启动检测
 
@@ -527,3 +545,4 @@ TVC 专属迭代重点：
 | 镜头语言 | `references/shot-language.md` | 提示词句法、画风锚定词库、场景类型模板、构图范式 | 视觉定调 / 前期筹备 / 分镜与拍摄 |
 | 分镜与视频 | `references/storyboard.md` | 多宫格分镜、视频提示词、产品拆解、品牌世界 | 分镜与拍摄 |
 | 交付与迭代 | `references/delivery.md` | 输出格式模板、迭代调试 | 前期筹备 / 分镜与拍摄 / 审片 / 交付 |
+| API 执行 | `references/api-execution.md` | 配置驱动调用图片/视频 API、任务轮询、产物保存 | 用户要求自动产图/产视频 |
