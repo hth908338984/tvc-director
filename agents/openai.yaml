@@ -1,0 +1,8 @@
+interface:
+  display_name: "TVC Director"
+  short_description: "Create TVC ad storyboards, prompts, and video scripts"
+  brand_color: "#2563EB"
+  default_prompt: "Use $tvc-director to create a product TVC ad concept, storyboard prompts, and Seedance video script."
+
+policy:
+  allow_implicit_invocation: true
